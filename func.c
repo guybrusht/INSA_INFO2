@@ -13,53 +13,6 @@ int* recuperer_n_entiers(int n)
 
 
 
-/* Vecteurs -------------------------------------------------------*/
-
-vecteur* creer_vecteur(char *nom_vecteur, int dimension_vecteur)
-{
-     vecteur *nouveau_vecteur;
-     nouveau_vecteur=(vecteur*) malloc (sizeof(vecteur));
-     strcpy(nouveau_vecteur->nom,nom_vecteur);                          // methode pour assigner une chaine de caracteres; ne pas oublier d'inclure string.h
-     nouveau_vecteur->dimension=dimension_vecteur;
-     nouveau_vecteur->tableau=(int*) malloc (dimension_vecteur*sizeof(int));
-     
-     return nouveau_vecteur;
-}
-
-
-void remplir_vecteur(vecteur vectA, int* TAB)                           // TAB doit contenir le meme nombre d'elements que vectA
-{
-     int i=0;
-     
-     for(i=0;i<vectA.dimension;i++)
-          vectA.tableau[i]=TAB[i];
-}
-
-void afficher_vecteur(vecteur vectA)
-{
-     int i=0;
-     
-     printf("[ ");
-     for(i=0;i<vectA.dimension;i++)
-          printf("%d ",vectA.tableau[i]);
-     printf("]\n");
-}
-
-     int produit_scalaire(vecteur vectA, vecteur vectB)                 // vectB doit contenir le meme nombre d'elements que vectA
-{
-     int i=0,R=0;
-     for(i=0;i<vectA.dimension;i++)
-          R+=vectA.tableau[i]*vectB.tableau[i]; 
-     return R;
-}
-
-void detruire_vecteur(vecteur* vectA)
-{
-     free(vectA->tableau);
-     free(vectA);
-}
-
-
 
 
 
@@ -85,6 +38,8 @@ matrice* creer_matrice(char *nom_matrice, int nb_lignes_matrice, int nb_colonnes
      
      else if(prop_matrice==SYMETRIQUE)
      {
+          nouvelle_matrice->remplir=&remplir_matrice_symetrique;
+          nouvelle_matrice->afficher=&afficher_matrice_symetrique;
           nouvelle_matrice->tableau_2d=allouer_matrice_symetrique(nb_lignes_matrice);
      }
      
@@ -118,7 +73,7 @@ TYPE_ELEMENTS_MATRICE** allouer_matrice_symetrique(int nb_lignes_matrice)
      matrice_allouee[0]=(TYPE_ELEMENTS_MATRICE*) malloc (nb_lignes_matrice*(nb_lignes_matrice+1)/2*sizeof(TYPE_ELEMENTS_MATRICE));  // calcul la somme des n premiers entiers pour trouver le nombre d'elements a stocker dans la matrice symetrique
      for(i=1;i<nb_lignes_matrice;i++)
      {
-          matrice_allouee[i]=matrice_allouee[0]+(nb_lignes_matrice+1-i)*sizeof(TYPE_ELEMENTS_MATRICE); // le nombre d'elements par ligne est decroissant de n à 1
+          matrice_allouee[i]=matrice_allouee[i-1]+i; // le nombre d'elements par ligne est croissant de 1 à n
      }
      
      return matrice_allouee;
@@ -148,6 +103,25 @@ void afficher_matrice_pleine(matrice matriceA)             //    /!\ distinguer 
      printf("#############################################\n\n");
 }
 
+void afficher_matrice_symetrique(matrice matriceA)             //    /!\ distinguer affichage de matrices pleines et symetriques
+{
+     int i,j;
+     printf("\n############# Matrice %s #############\n",matriceA.nom);
+
+     for (i=0; i<matriceA.nb_lignes; i++)
+     {
+          printf("[\t");
+          for (j=0; j<matriceA.nb_colonnes; j++)
+          {
+               if(j<=i) printf("%+d\t",matriceA.tableau_2d[i][j]);
+               else printf("%+d\t",matriceA.tableau_2d[j][i]);
+          }
+          printf("]\n");
+     }
+     printf("#############################################\n\n");
+}
+
+
 
 
 
@@ -166,6 +140,20 @@ void remplir_matrice_pleine(matrice matriceA, TYPE_ELEMENTS_MATRICE* TAB)		/*   
                matriceA.tableau_2d[i][j]=TAB[j+i*matriceA.nb_colonnes];
 }
 
+void remplir_matrice_symetrique(matrice matriceA, TYPE_ELEMENTS_MATRICE* TAB)               /*   /!\ TAB doit contenir le meme nombre d'elements que matriceA, soit nb_lignes*nb_colonnes */
+{
+     int i=0,j=0;
+     
+/*
+     for(j=0;j<matriceA.nb_colonnes;j++)
+          for(i=0;i<matriceA.nb_lignes;i++)
+               if(i<=j) matriceA.tableau_2d[i][j]=TAB[j+i*(i+1)/2];
+               */
+
+     for(i=0;i<matriceA.nb_lignes*(matriceA.nb_lignes+1)/2;i++)
+               matriceA.tableau_2d[0][i]=TAB[i];
+}
+
 
 
 /* Liberation de la memoire allouee */
@@ -175,6 +163,7 @@ void detruire_matrice(matrice* matriceA)
      free(matriceA->tableau_2d);
      free(matriceA);
 }
+
 
 /* Fonctions de calcul */
 matrice* produit_matriciel(matrice* matriceA, matrice* matriceB)
@@ -206,4 +195,21 @@ matrice* produit_matriciel(matrice* matriceA, matrice* matriceB)
           return produit;
      }
      
+}
+
+
+matrice* decomposition_cholesky(matrice* matriceA)
+{
+     
+     if(matriceA->proprietes==SYMETRIQUE)
+          return 0;
+     
+     else
+     {
+          /* Creation matrice resultat */
+          matrice *cholesky=creer_matrice(strcat("Decomposition de ",matriceA->nom), matriceA->nb_lignes, matriceA->nb_colonnes, NON_SYMETRIQUE);       
+     }
+     
+     
+
 }

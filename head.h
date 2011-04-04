@@ -3,22 +3,6 @@
 #include <string.h>
 
 
-/* Vecteurs */
-typedef struct {
-     char nom[15];
-     int dimension;
-     int* tableau;
-} vecteur;
-
-vecteur* creer_vecteur(char*, int);
-void remplir_vecteur(vecteur, int*);
-void afficher_vecteur(vecteur);
-int produit_scalaire(vecteur, vecteur);
-void detruire_vecteur(vecteur*);
-
-
-
-
 /* Matrices */
 
 
@@ -43,14 +27,22 @@ typedef struct matrice {
 
 
 
-/* Prototypes */
+/* Fonctions de gestion de memoire */
 matrice* creer_matrice(char*, int, int, int);
 TYPE_ELEMENTS_MATRICE** allouer_matrice_pleine(int, int);
 TYPE_ELEMENTS_MATRICE** allouer_matrice_symetrique(int);
+void detruire_matrice(matrice*);
+
+/* Fonctions d'affichage */
 void afficher_matrice(matrice);
 void afficher_matrice_pleine(matrice);
 void afficher_matrice_symetrique(matrice);
-void remplir_matrice_pleine(matrice, int*);
-void detruire_matrice(matrice*);
 
+/* Fonctions d'affichage */
+void remplir_matrice(matrice, TYPE_ELEMENTS_MATRICE*);
+void remplir_matrice_pleine(matrice, int*);
+void remplir_matrice_symetrique(matrice, int*);
+
+/* Fonctions de calcul */
 matrice* produit_matriciel(matrice*, matrice*);
+matrice* decomposition_cholesky(matrice*);
