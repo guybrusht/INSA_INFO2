@@ -1,7 +1,11 @@
 TODO
 
+Verifier Cholesky
 • déterminer x solution de Ax = b par appel à une fonction solve(A, b, x)
 • afficher le résultat
 • vérifier le résultat par appel à une fonction qui calcule
 • afficher le résultat
 • libérer l'espace mémoire alloué dynamiquement au cours du programme.
+
+Bugs
+cholesky

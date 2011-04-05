@@ -13,7 +13,7 @@ endif
 
 
 all: head.h main.o func.o 
-	$(CC) main.o func.o libmat.a
+	$(CC) main.o func.o libmat.a -lm
 	
 clean:
 	rm -rf *.o

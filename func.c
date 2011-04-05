@@ -1,12 +1,12 @@
 #include "head.h"
 
-int* recuperer_n_entiers(int n)
+TYPE_ELEMENTS_MATRICE* recuperer_n_entiers(int n)
 {
      int i=0;
-     int *TAB=(int*) malloc (n*sizeof(int));
+     TYPE_ELEMENTS_MATRICE *TAB=(TYPE_ELEMENTS_MATRICE*) malloc (n*sizeof(TYPE_ELEMENTS_MATRICE));
      
      for(i=0; i<n; i++)
-          scanf("%d",&TAB[i]);
+          scanf("%"FORMAT_PRINTF,&TAB[i]);
          
      return TAB;
 }
@@ -96,7 +96,7 @@ void afficher_matrice_pleine(matrice matriceA)             //    /!\ distinguer 
      {
           printf("[\t");
           for (j=0; j<matriceA.nb_colonnes; j++)
-               printf("%+d\t",matriceA.tableau_2d[i][j]);
+               printf("%+"FORMAT_PRINTF"\t",matriceA.tableau_2d[i][j]);
           
           printf("]\n");
      }
@@ -113,8 +113,8 @@ void afficher_matrice_symetrique(matrice matriceA)             //    /!\ disting
           printf("[\t");
           for (j=0; j<matriceA.nb_colonnes; j++)
           {
-               if(j<=i) printf("%+d\t",matriceA.tableau_2d[i][j]);
-               else printf("%+d\t",matriceA.tableau_2d[j][i]);
+               if(j<=i) printf("%+"FORMAT_PRINTF"\t",matriceA.tableau_2d[i][j]);
+               else printf("%+"FORMAT_PRINTF"\t",matriceA.tableau_2d[j][i]);
           }
           printf("]\n");
      }
@@ -200,14 +200,45 @@ matrice* produit_matriciel(matrice* matriceA, matrice* matriceB)
 
 matrice* decomposition_cholesky(matrice* matriceA)
 {
+     int i,j,k;
+     TYPE_ELEMENTS_MATRICE Cii, Cji;
      
-     if(matriceA->proprietes==SYMETRIQUE)
+     
+     if(matriceA->proprietes==NON_SYMETRIQUE)
           return 0;
      
      else
      {
           /* Creation matrice resultat */
-          matrice *cholesky=creer_matrice(strcat("Decomposition de ",matriceA->nom), matriceA->nb_lignes, matriceA->nb_colonnes, NON_SYMETRIQUE);       
+          matrice *cholesky=creer_matrice(strcat(matriceA->nom, "_Cholesky"), matriceA->nb_lignes, matriceA->nb_colonnes, NON_SYMETRIQUE);
+          
+          
+          /* Implementation de la methode de Cholesky */
+          for (i=0; i<cholesky->nb_lignes; i++)
+          {
+               /* Calcul de Cii */
+               Cii=matriceA->tableau_2d[i][i];     
+               for(k=0;k<i;k++)
+               {
+                    Cii-=cholesky->tableau_2d[i][k]*cholesky->tableau_2d[i][k];                         
+               }
+               cholesky->tableau_2d[i][i]=sqrt(Cii);
+               
+               for (j=i+1; j<cholesky->nb_colonnes; j++) cholesky->tableau_2d[i][j]=0; // On remplit le triangle vide par des 0
+               
+               for (j=i+1; j<cholesky->nb_colonnes; j++)
+               {
+                    Cji=matriceA->tableau_2d[i][j];
+                    for(k=0;k<i;k++)
+                    {
+                         Cji-=cholesky->tableau_2d[i][k]*cholesky->tableau_2d[j][k];                         
+                    }
+               cholesky->tableau_2d[j][i]=Cji/cholesky->tableau_2d[i][i];
+               }
+          }
+          
+          
+          return cholesky;
      }
      
      

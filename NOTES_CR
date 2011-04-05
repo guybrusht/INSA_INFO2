@@ -1,0 +1,11 @@
+Notes Compte Rendu
+
+
+Utilisation de gdb pour le debugging
+
+break nom_du_fichier.c:numero_de_ligne
+run
+step
+continue
+
+print *TAB@6
