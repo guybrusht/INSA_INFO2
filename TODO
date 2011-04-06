@@ -7,5 +7,8 @@ Verifier Cholesky
 • afficher le résultat
 • libérer l'espace mémoire alloué dynamiquement au cours du programme.
 
+
+Fonctions de conversion de matrice symetrique vers non symettrique et vice versa
+
 Bugs
 cholesky ne marche pas dans tous les cas

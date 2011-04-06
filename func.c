@@ -1,6 +1,6 @@
 #include "head.h"
 
-TYPE_ELEMENTS_MATRICE* recuperer_n_entiers(int n)
+TYPE_ELEMENTS_MATRICE* recupererNValeurs(int n)
 {
      int i=0;
      TYPE_ELEMENTS_MATRICE *TAB=(TYPE_ELEMENTS_MATRICE*) malloc (n*sizeof(TYPE_ELEMENTS_MATRICE));
@@ -155,7 +155,12 @@ void remplir_matrice_symetrique(matrice matriceA, TYPE_ELEMENTS_MATRICE* TAB)   
 }
 
 
-
+void transposerMatrice(matrice matriceA, matrice matriceB)
+{
+     
+     
+     
+}
 
 
 
@@ -170,39 +175,46 @@ void detruire_matrice(matrice* matriceA)
 
 
 /* Fonctions de calcul */
-matrice* produit_matriciel(matrice* matriceA, matrice* matriceB)
+matrice* produitMatriciel(matrice* matriceA, matrice* matriceB)
 {
      /* Verification compatibilite matrices */
      if(matriceA->nb_colonnes!=matriceB->nb_lignes)
-          return 0;
+          return NULL;
      
      else
      {
-          int i,j,k,tmp;
-          
           /* Creation matrice bonnes dimensions */
           matrice *produit=creer_matrice(strcat(strcat(matriceA->nom,"*"),matriceB->nom), matriceA->nb_lignes, matriceB->nb_colonnes, NON_SYMETRIQUE);
           
           /* Calcul du produit */
-          for(i=0;i<matriceA->nb_lignes;i++)  // ligne de calcul de la premiere matrice
-          {
-               for(j=0;j<matriceB->nb_colonnes;j++)  // colonne de calcul de la deuxieme matrice
-               {
-                    tmp=0;
-                    for(k=0;k<matriceB->nb_lignes;k++)
-                    {
-                         tmp+=matriceA->tableau_2d[i][k]*matriceB->tableau_2d[k][j];
-                    }
-                    produit->tableau_2d[i][j]=tmp;
-               }
-          }
+          calculProduit(matriceA->tableau_2d, matriceB->tableau_2d, produit->tableau_2d, matriceA->nb_lignes, matriceA->nb_colonnes, matriceB->nb_colonnes);
+
           return produit;
      }
      
 }
 
 
-matrice* decomposition_cholesky(matrice* matriceA)      // retourne un pointeur vers la matrice decomposee ou NULL si une erreur s'est produite
+void calculProduit(TYPE_ELEMENTS_MATRICE** tableauA, TYPE_ELEMENTS_MATRICE** tableauB, TYPE_ELEMENTS_MATRICE** tableauResultat, int nbLignesA, int nbColonnesA, int nbColonnesB)
+{
+     int i,j,k,tmp;
+     
+     for(i=0;i<nbLignesA;i++)  // ligne de calcul de la premiere matrice
+     {
+          for(j=0;j<nbColonnesB;j++)  // colonne de calcul de la deuxieme matrice
+          {
+               tmp=0;
+               for(k=0;k<nbColonnesA;k++)
+               {
+                    tmp+=tableauA[i][k]*tableauB[k][j];
+               }
+               tableauResultat[i][j]=tmp;
+          }
+     }
+}
+
+
+matrice* decompositionCholesky(matrice* matriceA)      // retourne un pointeur vers la matrice decomposee ou NULL si une erreur s'est produite
 {
      if(matriceA->proprietes==NON_SYMETRIQUE)
           return NULL;
@@ -211,13 +223,17 @@ matrice* decomposition_cholesky(matrice* matriceA)      // retourne un pointeur 
      {
           /* Creation matrice resultat */
           matrice *decompCholesky=creer_matrice(strcat(matriceA->nom, "_Cholesky"), matriceA->nb_lignes, matriceA->nb_colonnes, NON_SYMETRIQUE);
-          cholesky(matriceA->tableau_2d,decompCholesky->tableau_2d,matriceA->nb_lignes);
+          if(cholesky(matriceA->tableau_2d,decompCholesky->tableau_2d,matriceA->nb_lignes)==0)  // y a t il eu un probleme?
+          {
+               detruire_matrice(decompCholesky);
+               return NULL;
+          }
           return decompCholesky;
      }
      
 }
 
-void cholesky(TYPE_ELEMENTS_MATRICE** tableauADecomposer, TYPE_ELEMENTS_MATRICE** tableauResultat, int dimension)
+int cholesky(TYPE_ELEMENTS_MATRICE** tableauADecomposer, TYPE_ELEMENTS_MATRICE** tableauResultat, int dimension)
 {
      int i,j,k;
      TYPE_ELEMENTS_MATRICE Cii;
@@ -236,11 +252,13 @@ void cholesky(TYPE_ELEMENTS_MATRICE** tableauADecomposer, TYPE_ELEMENTS_MATRICE*
      
                if (i==j)
                {
+                    if(Cii<0) return 0;  // pas de racine de nombre neg, sinon erreur.
                     Cii = sqrt(Cii);
+                    
                     tableauResultat[i][j] = Cii;
                } 
                else tableauResultat[i][j] = Cii/tableauResultat[j][j];
           }
      } 
-     
+     return 1; // tout est ok
 }

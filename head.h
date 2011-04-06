@@ -49,6 +49,8 @@ void remplir_matrice_symetrique(matrice, TYPE_ELEMENTS_MATRICE*);
 void transposerMatrice(matrice matriceA, matrice matriceB);
 
 /* Fonctions de calcul */
-matrice* produit_matriciel(matrice*, matrice*);
-matrice* decomposition_cholesky(matrice*);
-void cholesky(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int);  // 3e niveau
+matrice* produitMatriciel(matrice*, matrice*);
+void calculProduit(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int, int, int);  // 3e niveau
+
+matrice* decompositionCholesky(matrice*);
+int cholesky(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int);  // 3e niveau; vaut 0 si un probleme est survenu, 1 si succes
