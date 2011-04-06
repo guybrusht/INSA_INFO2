@@ -156,6 +156,10 @@ void remplir_matrice_symetrique(matrice matriceA, TYPE_ELEMENTS_MATRICE* TAB)   
 
 
 
+
+
+
+
 /* Liberation de la memoire allouee */
 void detruire_matrice(matrice* matriceA)   
 {
@@ -198,49 +202,45 @@ matrice* produit_matriciel(matrice* matriceA, matrice* matriceB)
 }
 
 
-matrice* decomposition_cholesky(matrice* matriceA)
+matrice* decomposition_cholesky(matrice* matriceA)      // retourne un pointeur vers la matrice decomposee ou NULL si une erreur s'est produite
 {
-     int i,j,k;
-     TYPE_ELEMENTS_MATRICE Cii, Cji;
-     
-     
      if(matriceA->proprietes==NON_SYMETRIQUE)
-          return 0;
+          return NULL;
      
      else
      {
           /* Creation matrice resultat */
-          matrice *cholesky=creer_matrice(strcat(matriceA->nom, "_Cholesky"), matriceA->nb_lignes, matriceA->nb_colonnes, NON_SYMETRIQUE);
-          
-          
-          /* Implementation de la methode de Cholesky */
-          for (i=0; i<cholesky->nb_lignes; i++)
-          {
-               /* Calcul de Cii */
-               Cii=matriceA->tableau_2d[i][i];     
-               for(k=0;k<i;k++)
-               {
-                    Cii-=cholesky->tableau_2d[i][k]*cholesky->tableau_2d[i][k];                         
-               }
-               cholesky->tableau_2d[i][i]=sqrt(Cii);
-               
-               for (j=i+1; j<cholesky->nb_colonnes; j++) cholesky->tableau_2d[i][j]=0; // On remplit le triangle vide par des 0
-               
-               for (j=i+1; j<cholesky->nb_colonnes; j++)
-               {
-                    Cji=matriceA->tableau_2d[i][j];
-                    for(k=0;k<i;k++)
-                    {
-                         Cji-=cholesky->tableau_2d[i][k]*cholesky->tableau_2d[j][k];                         
-                    }
-               cholesky->tableau_2d[j][i]=Cji/cholesky->tableau_2d[i][i];
-               }
-          }
-          
-          
-          return cholesky;
+          matrice *decompCholesky=creer_matrice(strcat(matriceA->nom, "_Cholesky"), matriceA->nb_lignes, matriceA->nb_colonnes, NON_SYMETRIQUE);
+          cholesky(matriceA->tableau_2d,decompCholesky->tableau_2d,matriceA->nb_lignes);
+          return decompCholesky;
      }
      
-     
+}
 
+void cholesky(TYPE_ELEMENTS_MATRICE** tableauADecomposer, TYPE_ELEMENTS_MATRICE** tableauResultat, int dimension)
+{
+     int i,j,k;
+     TYPE_ELEMENTS_MATRICE Cii;
+     
+     /* Implementation de la methode de Cholesky */
+     for (i=0; i<dimension; i++)
+     {
+          for (j=0; j<=i; j++)
+          {
+               Cii=tableauADecomposer[i][j];
+     
+               tableauResultat[j][i] = 0;
+     
+               for (k=0; k<j; k++)
+                    Cii-=tableauResultat[i][k]*tableauResultat[j][k];      
+     
+               if (i==j)
+               {
+                    Cii = sqrt(Cii);
+                    tableauResultat[i][j] = Cii;
+               } 
+               else tableauResultat[i][j] = Cii/tableauResultat[j][j];
+          }
+     } 
+     
 }

@@ -103,9 +103,10 @@ int main()
      remplir_matrice(*A, valeurs);
      afficher_matrice(*A);
      
-     
-     afficher_matrice(*decomposition_cholesky(A));
+     matrice *B=decomposition_cholesky(A);
+     afficher_matrice(*B);
      detruire_matrice(A);
+     detruire_matrice(B);
   
      
      

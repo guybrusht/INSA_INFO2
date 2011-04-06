@@ -8,4 +8,4 @@ Verifier Cholesky
 • libérer l'espace mémoire alloué dynamiquement au cours du programme.
 
 Bugs
-cholesky
+cholesky ne marche pas dans tous les cas

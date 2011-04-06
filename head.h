@@ -40,11 +40,15 @@ void afficher_matrice(matrice);
 void afficher_matrice_pleine(matrice);
 void afficher_matrice_symetrique(matrice);
 
-/* Fonctions d'affichage */
+/* Fonctions de remplissage */
 void remplir_matrice(matrice, TYPE_ELEMENTS_MATRICE*);
 void remplir_matrice_pleine(matrice, TYPE_ELEMENTS_MATRICE*);
 void remplir_matrice_symetrique(matrice, TYPE_ELEMENTS_MATRICE*);
 
+/* Fonctions de manipulation de matrices */
+void transposerMatrice(matrice matriceA, matrice matriceB);
+
 /* Fonctions de calcul */
 matrice* produit_matriciel(matrice*, matrice*);
 matrice* decomposition_cholesky(matrice*);
+void cholesky(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int);  // 3e niveau
