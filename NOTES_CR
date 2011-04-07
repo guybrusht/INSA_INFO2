@@ -13,7 +13,7 @@ print *TAB@6
 
 
 
-
+ifdef DBG
 
 
 Utilisation d'un Git
@@ -23,3 +23,168 @@ Utilisation d'un Git
 
 La methode de saisie des donnees est peu evoluee mais c'est fait expres. En effet, elle permet de creer des fichiers des cas que l'on peut ensuite utiliser comme entrees pour le programme
 ex:     ./a.out < testGauss.dat
+
+
+
+exemple de commande pour tester bug:
+(echo "run < crashTest.dat"; cat) | (echo "break func.c:246"; cat) | gdb a.out
+
+
+
+
+
+valgrind m'a permis de resoudre un beau plantage:
+et un oubli de liberation
+
+[guybrusht@ArchLaptop ProjetINFO]$ ./a.out
+
+ *******************************************************
+ *                                                     *
+ *           Resolution de A x = B                     *
+ *                                                     *
+ *******************************************************
+ *                                                     *
+ *   Precisez si A est :                               *
+ *                                                     *
+ *   0 => non symetrique (resolution par LU+Gauss)     *
+ *   1 => symetrique (resolution par Cholesky+Gauss)   *
+ *                                                     *
+ *******************************************************
+
+ *   Choix : 1
+ *   Nombre d'equations :
+ *   N = 3
+
+ *   Donner les valeurs de A: 
+ *   /!\ Attention: seules les valeurs du triangle inferieur sont a entrer,
+ *   c'est-a-dire A[0][0], A[1][0], A[1][1], A[2][0], ...
+ >   1
+ >   1
+ >   2
+ >   1
+ >   3
+ >   6
+
+############# Matrice ( A ) 
+[       +1.000000       +1.000000       +1.000000       ]
+[       +1.000000       +2.000000       +3.000000       ]
+[       +1.000000       +3.000000       +6.000000       ]
+
+
+ *   Donner les valeurs pour le vecteur B: 
+ >   2
+ >   5
+ >   6
+
+############# Matrice ( B ) 
+[       +2.000000       ]
+[       +5.000000       ]
+[       +6.000000       ]
+
+La decomposition Cholesky donne la matrice C suivante:
+############# Matrice ( A_Cholesky ) 
+[       +1.000000       +0.000000       +0.000000       ]
+[       +1.000000       +1.000000       +0.000000       ]
+[       +1.000000       +2.000000       +1.000000       ]
+
+La resolution par Gauss donne la matrice Y suivante:
+############# Matrice ( Solution[A_Cholesky*(?)=B] ) 
+[       +2.000000       ]
+[       +3.000000       ]
+[       -2.000000       ]
+
+
+############# Matrice ( A_Cholesky transposee ) 
+[       +1.000000       +1.000000       +1.000000       ]
+[       +0.000000       +1.000000       +2.000000       ]
+[       +0.000000       +0.000000       +1.000000       ]
+
+La resolution par Gauss donne la matrice X suivante:
+############# Matrice ( SOLUTION FINALE ) 
+[       -3.000000       ]
+[       +7.000000       ]
+[       -2.000000       ]
+
+Liberation memoire de A_Cholesky transposee... OK!
+Liberation memoire de Solution[A_Cholesky*(?)=B]... OK!
+Liberation memoire de A_Cholesky... OK!
+
+
+
+
+
+ *   Passage a la phase de verification.
+ *   Calcul du produit y=Ax
+############# Matrice ( A * SOLUTION FINALE ) 
+[       +2.000000       ]
+[       +5.000000       ]
+[       +6.000000       ]
+
+*** glibc detected *** ./a.out: free(): invalid next size (fast): 0x0000000001b45660 ***
+======= Backtrace: =========
+/lib/libc.so.6(+0x71b96)[0x7f5ba2d53b96]
+/lib/libc.so.6(cfree+0x6c)[0x7f5ba2d5896c]
+./a.out[0x4012b7]
+./a.out[0x400b34]
+/lib/libc.so.6(__libc_start_main+0xfd)[0x7f5ba2d00dcd]
+./a.out[0x400789]
+======= Memory map: ========
+00400000-00404000 r-xp 00000000 08:18 8391701                            /home/guybrusht/ProjetINFO/a.out
+00603000-00604000 rw-p 00003000 08:18 8391701                            /home/guybrusht/ProjetINFO/a.out
+01b45000-01b66000 rw-p 00000000 00:00 0                                  [heap]
+7f5b9c000000-7f5b9c021000 rw-p 00000000 00:00 0 
+7f5b9c021000-7f5ba0000000 ---p 00000000 00:00 0 
+7f5ba2acc000-7f5ba2ae1000 r-xp 00000000 08:18 10753987                   /usr/lib/libgcc_s.so.1
+7f5ba2ae1000-7f5ba2ce1000 ---p 00015000 08:18 10753987                   /usr/lib/libgcc_s.so.1
+7f5ba2ce1000-7f5ba2ce2000 rw-p 00015000 08:18 10753987                   /usr/lib/libgcc_s.so.1
+7f5ba2ce2000-7f5ba2e3a000 r-xp 00000000 08:18 9175052                    /lib/libc-2.13.so
+7f5ba2e3a000-7f5ba3039000 ---p 00158000 08:18 9175052                    /lib/libc-2.13.so
+7f5ba3039000-7f5ba303d000 r--p 00157000 08:18 9175052                    /lib/libc-2.13.so
+7f5ba303d000-7f5ba303e000 rw-p 0015b000 08:18 9175052                    /lib/libc-2.13.so
+7f5ba303e000-7f5ba3043000 rw-p 00000000 00:00 0 
+7f5ba3043000-7f5ba30c4000 r-xp 00000000 08:18 9175051                    /lib/libm-2.13.so
+7f5ba30c4000-7f5ba32c4000 ---p 00081000 08:18 9175051                    /lib/libm-2.13.so
+7f5ba32c4000-7f5ba32c5000 r--p 00081000 08:18 9175051                    /lib/libm-2.13.so
+7f5ba32c5000-7f5ba32c6000 rw-p 00082000 08:18 9175051                    /lib/libm-2.13.so
+7f5ba32c6000-7f5ba32e4000 r-xp 00000000 08:18 9175059                    /lib/ld-2.13.so
+7f5ba34b9000-7f5ba34bc000 rw-p 00000000 00:00 0 
+7f5ba34e0000-7f5ba34e3000 rw-p 00000000 00:00 0 
+7f5ba34e3000-7f5ba34e4000 r--p 0001d000 08:18 9175059                    /lib/ld-2.13.so
+7f5ba34e4000-7f5ba34e5000 rw-p 0001e000 08:18 9175059                    /lib/ld-2.13.so
+7f5ba34e5000-7f5ba34e6000 rw-p 00000000 00:00 0 
+7fff66d25000-7fff66d47000 rw-p 00000000 00:00 0                          [stack]
+7fff66dff000-7fff66e00000 r-xp 00000000 00:00 0                          [vdso]
+ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsyscall]
+Liberation memoire de A * SOLUTION FINALE...Aborted
+
+
+
+
+
+
+
+
+void calculProduitSym(TYPE_ELEMENTS_MATRICE **tableauA, TYPE_ELEMENTS_MATRICE **tableauB, TYPE_ELEMENTS_MATRICE **tableauResultat, int nbLignesA, int nbColonnesA, int nbColonnesB)
+{
+     int i,j,k,tmp;
+     
+     for(i=0;i<nbLignesA;i++)  // ligne de calcul de la premiere matrice
+     {
+          for(j=0;j<=i;j++)  // colonne de calcul de la deuxieme matrice          (ici il fallait mettre j<nbColonnesB; à force de tests et de copier coller, j'avais laisse passer une coquille)
+          {
+               tmp=0;
+               for(k=0;k<=i;k++)
+               {
+                    tmp+=tableauA[i][k]*tableauB[k][j];
+               }
+               for(k=i+1;k<nbColonnesA;k++)
+               {
+                    tmp+=tableauA[k][i]*tableauB[k][j];
+               }
+               tableauResultat[i][j]=tmp;
+          }
+          
+     }
+}
+
+

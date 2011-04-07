@@ -1,11 +1,11 @@
-DBG = y
+DBG = 1
 
 
 # Compilateur
 CC	= gcc
 
 # Flags
-ifeq ($(DBG),y)
+ifeq ($(DBG),1)
      CFLAGS	= -c -g
 else
      CFLAGS	= -c

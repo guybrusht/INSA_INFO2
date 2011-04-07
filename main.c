@@ -215,9 +215,10 @@ int main()
      
      /* Programme principal */
      
+     
      int is_A_symetrique, n;
 
-     // choix de la methode 
+     /* Choix de la methode et parametrage du systeme */
      printf("\n *******************************************************\n");    
      printf(" *                                                     *\n");      
      printf(" *           Resolution de A x = B                     *\n");    
@@ -240,13 +241,12 @@ int main()
           return 0;
      } 
      
-     
- 
-
      printf(" *   Nombre d'equations :\n *   N = ");
      scanf("%d",&n);  
      
   
+     
+     /* Remplissage et affichage de A */
      TYPE_ELEMENTS_MATRICE* valeurs;
      printf("\n *   Donner les valeurs de A: \n");
      
@@ -265,8 +265,9 @@ int main()
      free(valeurs);
      afficher_matrice(*A);
      
-     printf("\n *   Donner les valeurs pour le vecteur B: \n");
      
+     /* Remplissage et affichage de B */
+     printf("\n *   Donner les valeurs pour le vecteur B: \n");     
      matrice *B=creer_matrice("B",n,1,NON_SYMETRIQUE, INVERSIBLE, NON_POSITIVE);
      valeurs=recupererNValeurs(n*1);
      remplir_matrice(*B, valeurs);
@@ -274,23 +275,22 @@ int main()
      afficher_matrice(*B);
      
      
+     /* Resolution du systeme */
      matrice *X;
-     solve(A,B,X);
+     solve(A,B,&X);
+
      
-/*     
-     matrice *X=resolutionGauss(A, B);
-     if(X==NULL) printf("La matrice que vous essayez de decomposer est symetrique ou pas definie positive.\n");
-          
-     else
-     {
-          afficher_matrice(*X);
-          
-          matrice *P=produitMatriciel(A,X);
-          afficher_matrice(*P);
-          detruire_matrice(X);
-          detruire_matrice(P);
-     }
-     */     
+     /* Produit y=Ax */
+     printf("\n\n\n\n\n *   Passage a la phase de verification.\n");
+     printf(" *   Calcul du produit y=Ax");
+     matrice *P=produitMatriciel(A,X);
+     afficher_matrice(*P);
+     
+     
+     /* Liberation des allocations */
+     detruire_matrice(B);
+     detruire_matrice(P);
+     detruire_matrice(X);
      detruire_matrice(A);
 
 }

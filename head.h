@@ -4,8 +4,10 @@
 #include <math.h>
 
 
-/* Matrices */
+#define DBG
 
+
+/* Matrices */
 
 #define TYPE_ELEMENTS_MATRICE double    // permet de changer facilement le type de donnees gerees, ici on gere des tableaux de doubles
 #define FORMAT_PRINTF "lf"
@@ -18,7 +20,6 @@
 
 #define NON_POSITIVE 0
 #define POSITIVE 1
-
 
 
 /* Structure de la matrice */
@@ -60,6 +61,7 @@ matrice* transposerMatrice(matrice* matriceA);
 /* Fonctions de calcul */
 matrice* produitMatriciel(matrice*, matrice*);
 void calculProduit(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int, int, int);  // 3e niveau
+void calculProduitSym(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int, int, int);  // 3e niveau
 matrice* decompositionCholesky(matrice*);
 int cholesky(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int);  // 3e niveau; vaut 0 si un probleme est survenu, 1 si succes
 int decompositionLU(matrice*, matrice**, matrice**);  // passage par reference des adresses des pointeurs pour modifier les matrices designees
@@ -67,4 +69,4 @@ int decompLU(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MAT
 matrice* resolutionGauss(matrice*, matrice*);
 int pivotDeGauss(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int, TYPE_ELEMENTS_MATRICE**);
 
-int solve(matrice*, matrice*, matrice*); // FONCTION DE RESOLUTION ULTIME
+int solve(matrice*, matrice*, matrice**); // FONCTION DE RESOLUTION ULTIME
