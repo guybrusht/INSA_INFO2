@@ -279,18 +279,23 @@ int cholesky(TYPE_ELEMENTS_MATRICE** tableauADecomposer, TYPE_ELEMENTS_MATRICE**
 
 
 
-matrice* decompositionLU(matrice* matriceA)      // retourne un pointeur vers la matrice decomposee ou NULL si une erreur s'est produite
+int decompositionLU(matrice* matriceA, matrice* matriceA_L, matrice* matriceA_U)      // retourne 1 si succes ou 0 si une erreur s'est produite
 {
      if(matriceA->proprietes==SYMETRIQUE)
-          return NULL;
+          return 0;
      
      else
-     {    /*
+     {    
           char nouveauNom[255];
+          
           strcat(nouveauNom,matriceA->nom);
-          strcat(nouveauNom,"_LU");
-
-          matrice *decompCholesky=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceA->nb_colonnes, NON_SYMETRIQUE);
+          strcat(nouveauNom,"_L");
+          matrice *decompL=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceA->nb_colonnes, NON_SYMETRIQUE);
+          
+          strcpy(nouveauNom,matriceA->nom);
+          strcat(nouveauNom,"_U");
+          matrice *decompU=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceA->nb_colonnes, NON_SYMETRIQUE);
+          /*
           if(cholesky(matriceA->tableau_2d,decompCholesky->tableau_2d,matriceA->nb_lignes)==0)  // y a t il eu un probleme?
           {
                detruire_matrice(decompCholesky);
@@ -298,6 +303,21 @@ matrice* decompositionLU(matrice* matriceA)      // retourne un pointeur vers la
           }
           return decompCholesky;
           */
+          
+          
+          matriceA_L=decompL;
+          matriceA_U=decompU;
+          return 1;
      }
      
+}
+
+int decompLU(TYPE_ELEMENTS_MATRICE** tableauADecomposer, TYPE_ELEMENTS_MATRICE** tableauL, TYPE_ELEMENTS_MATRICE** tableauU)
+{
+     
+     
+     
+     
+     
+     return 1;
 }

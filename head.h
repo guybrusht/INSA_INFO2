@@ -55,4 +55,5 @@ void calculProduit(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, TYPE_ELEMEN
 matrice* decompositionCholesky(matrice*);
 int cholesky(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int);  // 3e niveau; vaut 0 si un probleme est survenu, 1 si succes
 
-matrice* decompositionLU(matrice* matriceA);
+int decompositionLU(matrice*, matrice*, matrice*);
+int decompLU(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**); // 3e niveau
