@@ -18,3 +18,8 @@ renommer les fonctions en enlevant les _ pour mettre es majuscules par coherence
 Calculer le determinant d'une matrice pour verifier l'inversibilite et une verification de la positivite
 
 
+
+
+
+BUGS
+transposer et gauss pas prevu en symetrique

@@ -119,8 +119,6 @@ int main()
           detruire_matrice(BT);
           detruire_matrice(P);
      }
-     
-
                
      detruire_matrice(A);
      */
@@ -170,7 +168,7 @@ int main()
      
      
      /* Programme test Gauss */
-     
+     /*
      int lignes, colonnes;
 
      
@@ -210,8 +208,91 @@ int main()
      }
           
      detruire_matrice(A);
+     */
      
      
+     
+     
+     /* Programme principal */
+     
+     int is_A_symetrique, n;
+
+     // choix de la methode 
+     printf("\n *******************************************************\n");    
+     printf(" *                                                     *\n");      
+     printf(" *           Resolution de A x = B                     *\n");    
+     printf(" *                                                     *\n");      
+     printf(" *******************************************************\n");    
+     printf(" *                                                     *\n");      
+     printf(" *   Precisez si A est :                               *\n"); 
+     printf(" *                                                     *\n");
+     printf(" *   0 => non symetrique (resolution par LU+Gauss)     *\n");
+     printf(" *   1 => symetrique (resolution par Cholesky+Gauss)   *\n");
+     printf(" *                                                     *\n");    
+     printf(" *******************************************************\n\n");                  
+                 
+
+     printf(" *   Choix : ");
+     scanf("%d",&is_A_symetrique);
+     if(is_A_symetrique!=0 && is_A_symetrique!=1)
+     {
+          printf(" *   Choix invalide.\n");
+          return 0;
+     } 
+     
+     
+ 
+
+     printf(" *   Nombre d'equations :\n *   N = ");
+     scanf("%d",&n);  
+     
+  
+     TYPE_ELEMENTS_MATRICE* valeurs;
+     printf("\n *   Donner les valeurs de A: \n");
+     
+     matrice *A=creer_matrice("A",n,n, is_A_symetrique, INVERSIBLE, POSITIVE);
+     if(is_A_symetrique==0)
+     {
+          printf(" *   /!\\ Attention: il faut rentrer les valeurs ligne par ligne, donc toute la premiere puis toute la 2e, etc\n");
+          valeurs=recupererNValeurs(n*n);
+     }
+     else
+     {
+          printf(" *   /!\\ Attention: seules les valeurs du triangle inferieur sont a entrer,\n *   c'est-a-dire A[0][0], A[1][0], A[1][1], A[2][0], ...\n");
+          valeurs=recupererNValeurs(n*(n+1)/2);
+     }
+     remplir_matrice(*A, valeurs);
+     free(valeurs);
+     afficher_matrice(*A);
+     
+     printf("\n *   Donner les valeurs pour le vecteur B: \n");
+     
+     matrice *B=creer_matrice("B",n,1,NON_SYMETRIQUE, INVERSIBLE, NON_POSITIVE);
+     valeurs=recupererNValeurs(n*1);
+     remplir_matrice(*B, valeurs);
+     free(valeurs);
+     afficher_matrice(*B);
+     
+     
+     matrice *X;
+     solve(A,B,X);
+     
+/*     
+     matrice *X=resolutionGauss(A, B);
+     if(X==NULL) printf("La matrice que vous essayez de decomposer est symetrique ou pas definie positive.\n");
+          
+     else
+     {
+          afficher_matrice(*X);
+          
+          matrice *P=produitMatriciel(A,X);
+          afficher_matrice(*P);
+          detruire_matrice(X);
+          detruire_matrice(P);
+     }
+     */     
+     detruire_matrice(A);
+
 }
 
 

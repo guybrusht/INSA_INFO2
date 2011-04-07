@@ -60,12 +60,11 @@ matrice* transposerMatrice(matrice* matriceA);
 /* Fonctions de calcul */
 matrice* produitMatriciel(matrice*, matrice*);
 void calculProduit(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int, int, int);  // 3e niveau
-
 matrice* decompositionCholesky(matrice*);
 int cholesky(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int);  // 3e niveau; vaut 0 si un probleme est survenu, 1 si succes
-
 int decompositionLU(matrice*, matrice**, matrice**);  // passage par reference des adresses des pointeurs pour modifier les matrices designees
 int decompLU(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int); // 3e niveau
-
 matrice* resolutionGauss(matrice*, matrice*);
 int pivotDeGauss(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int, TYPE_ELEMENTS_MATRICE**);
+
+int solve(matrice*, matrice*, matrice*); // FONCTION DE RESOLUTION ULTIME
