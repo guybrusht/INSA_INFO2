@@ -366,7 +366,7 @@ matrice* resolutionGauss(matrice *matriceA, matrice *matriceB)      // retourne 
           strcat(nouveauNom,"]");
           matrice *solAXB=creer_matrice(nouveauNom, matriceA->nb_lignes, 1,NON_SYMETRIQUE, INVERSIBLE, NON_POSITIVE);
           
-          if(pivotDeGauss(matriceA->tableau_2d, matriceB->tableau_2d, matriceA->nb_lignes, solAXB->tableau_2d)==0) return 0;
+          if(pivotDeGauss(matriceA->tableau_2d, matriceB->tableau_2d, matriceA->nb_lignes, solAXB->tableau_2d)==0) return NULL;
           else
           {
                return solAXB;
@@ -381,29 +381,51 @@ int pivotDeGauss(TYPE_ELEMENTS_MATRICE **tableauA, TYPE_ELEMENTS_MATRICE **table
 
      int i,j,k;
      TYPE_ELEMENTS_MATRICE pivot,tmp;
-
+     
+     TYPE_ELEMENTS_MATRICE **TAB=(TYPE_ELEMENTS_MATRICE**) malloc (n*sizeof(TYPE_ELEMENTS_MATRICE*));
+     TAB[0]=(TYPE_ELEMENTS_MATRICE*) malloc (n*n*sizeof(TYPE_ELEMENTS_MATRICE));
+     
+     for(i=1;i<n;i++)                   //on copie tableauA dans un tableau temporaire
+     {                                  // pour pouvoir faire les permutations sans perdre les informations d'origine
+          TAB[i]=TAB[i-1]+n;
+     }
+     
+     for(i=0; i<n*n; i++)
+     {
+          TAB[0][i]=tableauA[0][i];          
+     } 
+         
+         
      for(k=0;k<n-1;k++)
      {
-          if(tableauA[k][k]==0) return 0;
+          if(TAB[k][k]==0)
+          {
+               free(TAB[0]);
+               free(TAB);
+               return 0;
+          }
 
           //reduction
           for(i=k+1;i<n;i++)
           {
-               pivot=tableauA[i][k]/tableauA[k][k];
-               for (j=k;j<n;j++) tableauA[i][j]=tableauA[i][j]-pivot*tableauA[k][j];
+               pivot=TAB[i][k]/TAB[k][k];
+               for (j=k;j<n;j++) TAB[i][j]=TAB[i][j]-pivot*TAB[k][j];
                tableauB[0][i]=tableauB[0][i]-pivot*tableauB[0][k];
           }
      }
-
+     
      /*  resolution par pivot de Gauss */
+     
      for(i=n-1;i>=0;i--)
      {
           tmp=tableauB[0][i];   
           for(j=i+1;j<n;j++)
-               tmp-=tableauA[i][j]*tableauX[0][j];                    
-          tableauX[0][i]=tmp/tableauA[i][i];
-     }
-
+               tmp-=TAB[i][j]*tableauX[0][j];                    
+          tableauX[0][i]=tmp/TAB[i][i];
+     }     
+ 
+     free(TAB[0]);
+     free(TAB);
      return 1;
 }
 
