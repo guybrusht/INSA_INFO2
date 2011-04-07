@@ -109,7 +109,14 @@ int main()
      else
      {
           afficher_matrice(*B);
+          matrice *BT=transposerMatrice(B);
+
+          afficher_matrice(*BT);
+          matrice *P=produitMatriciel(B,BT);
+          afficher_matrice(*P);
           detruire_matrice(B);
+          detruire_matrice(BT);
+          detruire_matrice(P);
      }
                
      detruire_matrice(A);

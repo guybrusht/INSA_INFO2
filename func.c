@@ -90,7 +90,7 @@ void afficher_matrice(matrice matriceA)
 void afficher_matrice_pleine(matrice matriceA)             //    /!\ distinguer affichage de matrices pleines et symetriques
 {
      int i,j;
-     printf("\n############# Matrice %s #############\n",matriceA.nom);
+     printf("\n############# Matrice ( %s ) \n",matriceA.nom);
 
      for (i=0; i<matriceA.nb_lignes; i++)
      {
@@ -100,13 +100,13 @@ void afficher_matrice_pleine(matrice matriceA)             //    /!\ distinguer 
           
           printf("]\n");
      }
-     printf("#############################################\n\n");
+     printf("\n");
 }
 
 void afficher_matrice_symetrique(matrice matriceA)             //    /!\ distinguer affichage de matrices pleines et symetriques
 {
      int i,j;
-     printf("\n############# Matrice %s #############\n",matriceA.nom);
+     printf("\n############# Matrice ( %s ) \n",matriceA.nom);
 
      for (i=0; i<matriceA.nb_lignes; i++)
      {
@@ -118,7 +118,7 @@ void afficher_matrice_symetrique(matrice matriceA)             //    /!\ disting
           }
           printf("]\n");
      }
-     printf("#############################################\n\n");
+     printf("\n");
 }
 
 
@@ -144,22 +144,27 @@ void remplir_matrice_symetrique(matrice matriceA, TYPE_ELEMENTS_MATRICE* TAB)   
 {
      int i=0,j=0;
      
-/*
-     for(j=0;j<matriceA.nb_colonnes;j++)
-          for(i=0;i<matriceA.nb_lignes;i++)
-               if(i<=j) matriceA.tableau_2d[i][j]=TAB[j+i*(i+1)/2];
-               */
-
      for(i=0;i<matriceA.nb_lignes*(matriceA.nb_lignes+1)/2;i++)
                matriceA.tableau_2d[0][i]=TAB[i];
 }
 
 
-void transposerMatrice(matrice matriceA, matrice matriceB)
+matrice* transposerMatrice(matrice* matriceA)
 {
+     int i,j;
      
+     char nouveauNom[255];
+     strcat(nouveauNom,matriceA->nom);
+     strcat(nouveauNom," transposee");
      
-     
+     /* Creation matrice */
+     matrice *transposee=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceA->nb_colonnes, NON_SYMETRIQUE);     
+
+     for(i=0;i<matriceA->nb_lignes;i++)
+          for (j=0;j<matriceA->nb_colonnes;j++)
+               transposee->tableau_2d[i][j]=matriceA->tableau_2d[j][i];
+          
+     return transposee;
 }
 
 
@@ -183,8 +188,13 @@ matrice* produitMatriciel(matrice* matriceA, matrice* matriceB)
      
      else
      {
+          char nouveauNom[255];
+          strcat(nouveauNom,matriceA->nom);
+          strcat(nouveauNom," * ");
+          strcat(nouveauNom,matriceB->nom);
+          
           /* Creation matrice bonnes dimensions */
-          matrice *produit=creer_matrice(strcat(strcat(matriceA->nom,"*"),matriceB->nom), matriceA->nb_lignes, matriceB->nb_colonnes, NON_SYMETRIQUE);
+          matrice *produit=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceB->nb_colonnes, NON_SYMETRIQUE);
           
           /* Calcul du produit */
           calculProduit(matriceA->tableau_2d, matriceB->tableau_2d, produit->tableau_2d, matriceA->nb_lignes, matriceA->nb_colonnes, matriceB->nb_colonnes);
@@ -221,8 +231,11 @@ matrice* decompositionCholesky(matrice* matriceA)      // retourne un pointeur v
      
      else
      {
+          char nouveauNom[255];
+          strcat(nouveauNom,matriceA->nom);
+          strcat(nouveauNom,"_Cholesky");
           /* Creation matrice resultat */
-          matrice *decompCholesky=creer_matrice(strcat(matriceA->nom, "_Cholesky"), matriceA->nb_lignes, matriceA->nb_colonnes, NON_SYMETRIQUE);
+          matrice *decompCholesky=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceA->nb_colonnes, NON_SYMETRIQUE);
           if(cholesky(matriceA->tableau_2d,decompCholesky->tableau_2d,matriceA->nb_lignes)==0)  // y a t il eu un probleme?
           {
                detruire_matrice(decompCholesky);
@@ -261,4 +274,30 @@ int cholesky(TYPE_ELEMENTS_MATRICE** tableauADecomposer, TYPE_ELEMENTS_MATRICE**
           }
      } 
      return 1; // tout est ok
+}
+
+
+
+
+matrice* decompositionLU(matrice* matriceA)      // retourne un pointeur vers la matrice decomposee ou NULL si une erreur s'est produite
+{
+     if(matriceA->proprietes==SYMETRIQUE)
+          return NULL;
+     
+     else
+     {    /*
+          char nouveauNom[255];
+          strcat(nouveauNom,matriceA->nom);
+          strcat(nouveauNom,"_LU");
+
+          matrice *decompCholesky=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceA->nb_colonnes, NON_SYMETRIQUE);
+          if(cholesky(matriceA->tableau_2d,decompCholesky->tableau_2d,matriceA->nb_lignes)==0)  // y a t il eu un probleme?
+          {
+               detruire_matrice(decompCholesky);
+               return NULL;
+          }
+          return decompCholesky;
+          */
+     }
+     
 }

@@ -16,7 +16,7 @@
 
 /* Structure de la matrice */
 typedef struct matrice {
-     char nom[25];
+     char nom[255];
      int nb_lignes;
      int nb_colonnes;
      int proprietes;			// NON_SYMETRIQUE, SYMETRIQUE, ...
@@ -46,7 +46,7 @@ void remplir_matrice_pleine(matrice, TYPE_ELEMENTS_MATRICE*);
 void remplir_matrice_symetrique(matrice, TYPE_ELEMENTS_MATRICE*);
 
 /* Fonctions de manipulation de matrices */
-void transposerMatrice(matrice matriceA, matrice matriceB);
+matrice* transposerMatrice(matrice* matriceA);
 
 /* Fonctions de calcul */
 matrice* produitMatriciel(matrice*, matrice*);
@@ -54,3 +54,5 @@ void calculProduit(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, TYPE_ELEMEN
 
 matrice* decompositionCholesky(matrice*);
 int cholesky(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int);  // 3e niveau; vaut 0 si un probleme est survenu, 1 si succes
+
+matrice* decompositionLU(matrice* matriceA);
