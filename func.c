@@ -139,10 +139,7 @@ void remplir_matrice_pleine(matrice matriceA, TYPE_ELEMENTS_MATRICE *TAB)       
      
      for(i=0;i<matriceA.nb_lignes;i++)
           for(j=0;j<matriceA.nb_colonnes;j++)
-          {
                matriceA.tableau_2d[i][j]=TAB[j+i*matriceA.nb_colonnes];
-               if(matriceA.tableau_2d[i][j]<0) matriceA.positive=NON_POSITIVE;
-          }
 }
 
 void remplir_matrice_symetrique(matrice matriceA, TYPE_ELEMENTS_MATRICE *TAB)               /*   /!\ TAB doit contenir le meme nombre d'elements que matriceA, soit nb_lignes*nb_colonnes */
@@ -150,10 +147,8 @@ void remplir_matrice_symetrique(matrice matriceA, TYPE_ELEMENTS_MATRICE *TAB)   
      int i=0,j=0;
      
      for(i=0;i<matriceA.nb_lignes*(matriceA.nb_lignes+1)/2;i++)
-     {
           matriceA.tableau_2d[0][i]=TAB[i];
-          if(matriceA.tableau_2d[0][i]<0) matriceA.positive=NON_POSITIVE;
-     }
+
 }
 
 
@@ -162,7 +157,7 @@ matrice* transposerMatrice(matrice *matriceA)
      int i,j;
      
      char nouveauNom[255];
-     strcat(nouveauNom,matriceA->nom);
+     strcpy(nouveauNom,matriceA->nom);
      strcat(nouveauNom," transposee");
      
      /* Creation matrice */
@@ -197,7 +192,7 @@ matrice* produitMatriciel(matrice *matriceA, matrice *matriceB)
      else
      {
           char nouveauNom[255];
-          strcat(nouveauNom,matriceA->nom);
+          strcpy(nouveauNom,matriceA->nom);
           strcat(nouveauNom," * ");
           strcat(nouveauNom,matriceB->nom);
           
@@ -234,13 +229,13 @@ void calculProduit(TYPE_ELEMENTS_MATRICE **tableauA, TYPE_ELEMENTS_MATRICE **tab
 
 matrice* decompositionCholesky(matrice *matriceA)      // retourne un pointeur vers la matrice decomposee ou NULL si une erreur s'est produite
 {
-     if(matriceA->symetrique==NON_SYMETRIQUE || matriceA->inversible!=INVERSIBLE || matriceA->inversible!=POSITIVE)
+     if(matriceA->symetrique==NON_SYMETRIQUE || matriceA->inversible!=INVERSIBLE || matriceA->positive!=POSITIVE)
           return NULL;
      
      else
      {
           char nouveauNom[255];
-          strcat(nouveauNom,matriceA->nom);
+          strcpy(nouveauNom,matriceA->nom);
           strcat(nouveauNom,"_Cholesky");
           /* Creation matrice resultat */
           matrice *decompCholesky=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceA->nb_colonnes,NON_SYMETRIQUE, INVERSIBLE, POSITIVE);
@@ -289,28 +284,20 @@ int cholesky(TYPE_ELEMENTS_MATRICE **tableauADecomposer, TYPE_ELEMENTS_MATRICE *
 
 int decompositionLU(matrice *matriceA, matrice **matriceA_L, matrice **matriceA_U)      // retourne 1 si succes ou 0 si une erreur s'est produite
 {
-     if(matriceA->symetrique==SYMETRIQUE || matriceA->inversible!=INVERSIBLE || matriceA->inversible!=POSITIVE)
+     if(matriceA->symetrique==SYMETRIQUE || matriceA->inversible!=INVERSIBLE || matriceA->positive!=POSITIVE)
           return 0;
      
      else
      {    
           char nouveauNom[255];
           
-          strcat(nouveauNom,matriceA->nom);
+          strcpy(nouveauNom,matriceA->nom);
           strcat(nouveauNom,"_L");
           matrice *decompL=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceA->nb_colonnes,NON_SYMETRIQUE, INVERSIBLE, POSITIVE);
           
           strcpy(nouveauNom,matriceA->nom);
           strcat(nouveauNom,"_U");
           matrice *decompU=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceA->nb_colonnes,NON_SYMETRIQUE, INVERSIBLE, POSITIVE);
-          /*
-          if(cholesky(matriceA->tableau_2d,decompCholesky->tableau_2d,matriceA->nb_lignes)==0)  // y a t il eu un probleme?
-          {
-               detruire_matrice(decompCholesky);
-               return NULL;
-          }
-          return decompCholesky;
-          */
           
           if(decompLU(matriceA->tableau_2d, decompL->tableau_2d, decompU->tableau_2d, matriceA->nb_lignes)==0) return 0;
           else
@@ -355,5 +342,64 @@ int decompLU(TYPE_ELEMENTS_MATRICE **tableauADecomposer, TYPE_ELEMENTS_MATRICE *
      }
      
      
+     return 1;
+}
+
+
+
+matrice* resolutionGauss(matrice *matriceA, matrice *matriceB)      // retourne pointeur vers X si succes ou NULL si une erreur s'est produite
+{
+     if(matriceA->symetrique==SYMETRIQUE || matriceA->inversible!=INVERSIBLE || matriceA->positive!=POSITIVE || matriceA->nb_lignes!=matriceB->nb_lignes || matriceB->nb_colonnes!=1)
+          return NULL;
+     
+     else
+     {    
+          char nouveauNom[255];
+          
+          strcpy(nouveauNom,"Solution[");
+          strcat(nouveauNom,matriceA->nom);
+          strcat(nouveauNom,"*(?)=");
+          strcat(nouveauNom,matriceB->nom);
+          strcat(nouveauNom,"]");
+          matrice *solAXB=creer_matrice(nouveauNom, matriceA->nb_lignes, 1,NON_SYMETRIQUE, INVERSIBLE, NON_POSITIVE);
+          
+          if(pivotDeGauss(matriceA->tableau_2d, matriceB->tableau_2d, matriceA->nb_lignes, solAXB->tableau_2d)==0) return 0;
+          else
+          {
+               return solAXB;
+          }
+     }
+     
+}
+
+
+int pivotDeGauss(TYPE_ELEMENTS_MATRICE **tableauA, TYPE_ELEMENTS_MATRICE **tableauB, int n, TYPE_ELEMENTS_MATRICE **tableauX) // vaut 0 si pivot nul et resolution impossible ou 1 si succes
+{
+
+     int i,j,k;
+     TYPE_ELEMENTS_MATRICE pivot,tmp;
+
+     for(k=0;k<n-1;k++)
+     {
+          if(tableauA[k][k]==0) return 0;
+
+          //reduction
+          for(i=k+1;i<n;i++)
+          {
+               pivot=tableauA[i][k]/tableauA[k][k];
+               for (j=k;j<n;j++) tableauA[i][j]=tableauA[i][j]-pivot*tableauA[k][j];
+               tableauB[0][i]=tableauB[0][i]-pivot*tableauB[0][k];
+          }
+     }
+
+     /*  resolution par pivot de Gauss */
+     for(i=n-1;i>=0;i--)
+     {
+          tmp=tableauB[0][i];   
+          for(j=i+1;j<n;j++)
+               tmp-=tableauA[i][j]*tableauX[0][j];                    
+          tableauX[0][i]=tmp/tableauA[i][i];
+     }
+
      return 1;
 }

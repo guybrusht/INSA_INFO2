@@ -17,3 +17,9 @@ print *TAB@6
 
 
 Utilisation d'un Git
+
+
+
+
+La methode de saisie des donnees est peu evoluee mais c'est fait expres. En effet, elle permet de creer des fichiers des cas que l'on peut ensuite utiliser comme entrees pour le programme
+ex:     ./a.out < testGauss.dat

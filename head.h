@@ -66,3 +66,6 @@ int cholesky(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int);  // 3e nive
 
 int decompositionLU(matrice*, matrice**, matrice**);  // passage par reference des adresses des pointeurs pour modifier les matrices designees
 int decompLU(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int); // 3e niveau
+
+matrice* resolutionGauss(matrice*, matrice*);
+int pivotDeGauss(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int, TYPE_ELEMENTS_MATRICE**);
