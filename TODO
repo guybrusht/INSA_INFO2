@@ -10,5 +10,8 @@ Verifier Cholesky
 
 Fonctions de conversion de matrice symetrique vers non symettrique et vice versa
 
+Calculer le determinant d'une matrice pour verifier l'inversibilite
+
+
 Bugs
 cholesky ne marche pas dans tous les cas

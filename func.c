@@ -18,7 +18,7 @@ TYPE_ELEMENTS_MATRICE* recupererNValeurs(int n)
 
 /* Matrices -------------------------------------------------------*/
 
-matrice* creer_matrice(char *nom_matrice, int nb_lignes_matrice, int nb_colonnes_matrice, int prop_matrice)
+matrice* creer_matrice(char *nom_matrice, int nb_lignes_matrice, int nb_colonnes_matrice, int sym, int inv, int pos)
 {
      int i=0;
      
@@ -27,16 +27,18 @@ matrice* creer_matrice(char *nom_matrice, int nb_lignes_matrice, int nb_colonnes
      strcpy(nouvelle_matrice->nom,nom_matrice);                 // methode pour assigner une chaine de caracteres; ne pas oublier d'inclure string.h
      nouvelle_matrice->nb_lignes=nb_lignes_matrice;
      nouvelle_matrice->nb_colonnes=nb_colonnes_matrice;
-     nouvelle_matrice->proprietes=prop_matrice;
+     nouvelle_matrice->symetrique=sym;
+     nouvelle_matrice->inversible=inv;
+     nouvelle_matrice->positive=pos;
      
-     if(prop_matrice==NON_SYMETRIQUE)
+     if(sym==NON_SYMETRIQUE)
      {
           nouvelle_matrice->remplir=&remplir_matrice_pleine;
           nouvelle_matrice->afficher=&afficher_matrice_pleine;
           nouvelle_matrice->tableau_2d=allouer_matrice_pleine(nb_lignes_matrice, nb_colonnes_matrice);
      }
      
-     else if(prop_matrice==SYMETRIQUE)
+     else if(sym==SYMETRIQUE)
      {
           nouvelle_matrice->remplir=&remplir_matrice_symetrique;
           nouvelle_matrice->afficher=&afficher_matrice_symetrique;
@@ -126,30 +128,36 @@ void afficher_matrice_symetrique(matrice matriceA)             //    /!\ disting
 
 
 /* Fonctions de remplissage */
-void remplir_matrice(matrice matriceA, TYPE_ELEMENTS_MATRICE* TAB)
+void remplir_matrice(matrice matriceA, TYPE_ELEMENTS_MATRICE *TAB)
 {
      matriceA.remplir(matriceA, TAB);
 }
 
-void remplir_matrice_pleine(matrice matriceA, TYPE_ELEMENTS_MATRICE* TAB)		/*   /!\ TAB doit contenir le meme nombre d'elements que matriceA, soit nb_lignes*nb_colonnes */
+void remplir_matrice_pleine(matrice matriceA, TYPE_ELEMENTS_MATRICE *TAB)               /*   /!\ TAB doit contenir le meme nombre d'elements que matriceA, soit nb_lignes*nb_colonnes */
 {
      int i=0,j=0;
      
      for(i=0;i<matriceA.nb_lignes;i++)
           for(j=0;j<matriceA.nb_colonnes;j++)
+          {
                matriceA.tableau_2d[i][j]=TAB[j+i*matriceA.nb_colonnes];
+               if(matriceA.tableau_2d[i][j]<0) matriceA.positive=NON_POSITIVE;
+          }
 }
 
-void remplir_matrice_symetrique(matrice matriceA, TYPE_ELEMENTS_MATRICE* TAB)               /*   /!\ TAB doit contenir le meme nombre d'elements que matriceA, soit nb_lignes*nb_colonnes */
+void remplir_matrice_symetrique(matrice matriceA, TYPE_ELEMENTS_MATRICE *TAB)               /*   /!\ TAB doit contenir le meme nombre d'elements que matriceA, soit nb_lignes*nb_colonnes */
 {
      int i=0,j=0;
      
      for(i=0;i<matriceA.nb_lignes*(matriceA.nb_lignes+1)/2;i++)
-               matriceA.tableau_2d[0][i]=TAB[i];
+     {
+          matriceA.tableau_2d[0][i]=TAB[i];
+          if(matriceA.tableau_2d[0][i]<0) matriceA.positive=NON_POSITIVE;
+     }
 }
 
 
-matrice* transposerMatrice(matrice* matriceA)
+matrice* transposerMatrice(matrice *matriceA)
 {
      int i,j;
      
@@ -158,7 +166,7 @@ matrice* transposerMatrice(matrice* matriceA)
      strcat(nouveauNom," transposee");
      
      /* Creation matrice */
-     matrice *transposee=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceA->nb_colonnes, NON_SYMETRIQUE);     
+     matrice *transposee=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceA->nb_colonnes,NON_SYMETRIQUE, INVERSIBLE, POSITIVE);     
 
      for(i=0;i<matriceA->nb_lignes;i++)
           for (j=0;j<matriceA->nb_colonnes;j++)
@@ -171,7 +179,7 @@ matrice* transposerMatrice(matrice* matriceA)
 
 
 /* Liberation de la memoire allouee */
-void detruire_matrice(matrice* matriceA)   
+void detruire_matrice(matrice *matriceA)   
 {
      free(matriceA->tableau_2d[0]);
      free(matriceA->tableau_2d);
@@ -180,7 +188,7 @@ void detruire_matrice(matrice* matriceA)
 
 
 /* Fonctions de calcul */
-matrice* produitMatriciel(matrice* matriceA, matrice* matriceB)
+matrice* produitMatriciel(matrice *matriceA, matrice *matriceB)
 {
      /* Verification compatibilite matrices */
      if(matriceA->nb_colonnes!=matriceB->nb_lignes)
@@ -194,7 +202,7 @@ matrice* produitMatriciel(matrice* matriceA, matrice* matriceB)
           strcat(nouveauNom,matriceB->nom);
           
           /* Creation matrice bonnes dimensions */
-          matrice *produit=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceB->nb_colonnes, NON_SYMETRIQUE);
+          matrice *produit=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceB->nb_colonnes,NON_SYMETRIQUE, INVERSIBLE, POSITIVE);
           
           /* Calcul du produit */
           calculProduit(matriceA->tableau_2d, matriceB->tableau_2d, produit->tableau_2d, matriceA->nb_lignes, matriceA->nb_colonnes, matriceB->nb_colonnes);
@@ -205,7 +213,7 @@ matrice* produitMatriciel(matrice* matriceA, matrice* matriceB)
 }
 
 
-void calculProduit(TYPE_ELEMENTS_MATRICE** tableauA, TYPE_ELEMENTS_MATRICE** tableauB, TYPE_ELEMENTS_MATRICE** tableauResultat, int nbLignesA, int nbColonnesA, int nbColonnesB)
+void calculProduit(TYPE_ELEMENTS_MATRICE **tableauA, TYPE_ELEMENTS_MATRICE **tableauB, TYPE_ELEMENTS_MATRICE **tableauResultat, int nbLignesA, int nbColonnesA, int nbColonnesB)
 {
      int i,j,k,tmp;
      
@@ -224,9 +232,9 @@ void calculProduit(TYPE_ELEMENTS_MATRICE** tableauA, TYPE_ELEMENTS_MATRICE** tab
 }
 
 
-matrice* decompositionCholesky(matrice* matriceA)      // retourne un pointeur vers la matrice decomposee ou NULL si une erreur s'est produite
+matrice* decompositionCholesky(matrice *matriceA)      // retourne un pointeur vers la matrice decomposee ou NULL si une erreur s'est produite
 {
-     if(matriceA->proprietes==NON_SYMETRIQUE)
+     if(matriceA->symetrique==NON_SYMETRIQUE || matriceA->inversible!=INVERSIBLE || matriceA->inversible!=POSITIVE)
           return NULL;
      
      else
@@ -235,7 +243,7 @@ matrice* decompositionCholesky(matrice* matriceA)      // retourne un pointeur v
           strcat(nouveauNom,matriceA->nom);
           strcat(nouveauNom,"_Cholesky");
           /* Creation matrice resultat */
-          matrice *decompCholesky=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceA->nb_colonnes, NON_SYMETRIQUE);
+          matrice *decompCholesky=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceA->nb_colonnes,NON_SYMETRIQUE, INVERSIBLE, POSITIVE);
           if(cholesky(matriceA->tableau_2d,decompCholesky->tableau_2d,matriceA->nb_lignes)==0)  // y a t il eu un probleme?
           {
                detruire_matrice(decompCholesky);
@@ -246,7 +254,7 @@ matrice* decompositionCholesky(matrice* matriceA)      // retourne un pointeur v
      
 }
 
-int cholesky(TYPE_ELEMENTS_MATRICE** tableauADecomposer, TYPE_ELEMENTS_MATRICE** tableauResultat, int dimension)
+int cholesky(TYPE_ELEMENTS_MATRICE **tableauADecomposer, TYPE_ELEMENTS_MATRICE **tableauResultat, int dimension)
 {
      int i,j,k;
      TYPE_ELEMENTS_MATRICE Cii;
@@ -279,9 +287,9 @@ int cholesky(TYPE_ELEMENTS_MATRICE** tableauADecomposer, TYPE_ELEMENTS_MATRICE**
 
 
 
-int decompositionLU(matrice* matriceA, matrice* matriceA_L, matrice* matriceA_U)      // retourne 1 si succes ou 0 si une erreur s'est produite
+int decompositionLU(matrice *matriceA, matrice **matriceA_L, matrice **matriceA_U)      // retourne 1 si succes ou 0 si une erreur s'est produite
 {
-     if(matriceA->proprietes==SYMETRIQUE)
+     if(matriceA->symetrique==SYMETRIQUE || matriceA->inversible!=INVERSIBLE || matriceA->inversible!=POSITIVE)
           return 0;
      
      else
@@ -290,11 +298,11 @@ int decompositionLU(matrice* matriceA, matrice* matriceA_L, matrice* matriceA_U)
           
           strcat(nouveauNom,matriceA->nom);
           strcat(nouveauNom,"_L");
-          matrice *decompL=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceA->nb_colonnes, NON_SYMETRIQUE);
+          matrice *decompL=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceA->nb_colonnes,NON_SYMETRIQUE, INVERSIBLE, POSITIVE);
           
           strcpy(nouveauNom,matriceA->nom);
           strcat(nouveauNom,"_U");
-          matrice *decompU=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceA->nb_colonnes, NON_SYMETRIQUE);
+          matrice *decompU=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceA->nb_colonnes,NON_SYMETRIQUE, INVERSIBLE, POSITIVE);
           /*
           if(cholesky(matriceA->tableau_2d,decompCholesky->tableau_2d,matriceA->nb_lignes)==0)  // y a t il eu un probleme?
           {
@@ -304,19 +312,47 @@ int decompositionLU(matrice* matriceA, matrice* matriceA_L, matrice* matriceA_U)
           return decompCholesky;
           */
           
-          
-          matriceA_L=decompL;
-          matriceA_U=decompU;
-          return 1;
+          if(decompLU(matriceA->tableau_2d, decompL->tableau_2d, decompU->tableau_2d, matriceA->nb_lignes)==0) return 0;
+          else
+          {
+               *matriceA_L=decompL;
+               *matriceA_U=decompU;
+               return 1;
+          }
      }
      
 }
 
-int decompLU(TYPE_ELEMENTS_MATRICE** tableauADecomposer, TYPE_ELEMENTS_MATRICE** tableauL, TYPE_ELEMENTS_MATRICE** tableauU)
+int decompLU(TYPE_ELEMENTS_MATRICE **tableauADecomposer, TYPE_ELEMENTS_MATRICE **tableauL, TYPE_ELEMENTS_MATRICE **tableauU, int dimension)
 {
+     int i,j,k;
      
+     TYPE_ELEMENTS_MATRICE tmpLU;
      
-     
+     for(j=0;j<dimension;j++)
+     {
+          tableauL[j][j]=1;
+          for(i=0;i<=j;i++)
+          {
+               tmpLU=tableauADecomposer[i][j];
+               tableauU[j][i]=0;
+               for(k=0;k<i;k++)
+               {
+                    tmpLU-=tableauL[i][k]*tableauU[k][j];
+               }
+               tableauU[i][j]=tmpLU;
+          }
+          for(i=j+1;i<dimension;i++)
+          {
+               tmpLU=tableauADecomposer[i][j];
+               tableauL[j][i]=0;
+               for(k=0;k<j;k++)
+                    {
+                         tmpLU-=tableauL[i][k]*tableauU[k][j];
+                    }
+               tableauL[i][j]=tmpLU/tableauU[j][j];
+          }
+     }
      
      
      return 1;

@@ -17,7 +17,7 @@ int main()
      
      printf("Donner les valeurs: ");
      
-     matrice *A=creer_matrice("A",lignes,colonnes,NON_SYMETRIQUE);
+     matrice *A=creer_matrice("A",lignes,colonnes,NON_SYMETRIQUE, INVERSIBLE, POSITIVE);
      TYPE_ELEMENTS_MATRICE* valeurs=recupererNValeurs(lignes*colonnes);
      remplir_matrice(*A, valeurs);
      afficher_matrice(*A);
@@ -29,7 +29,7 @@ int main()
      scanf("%d",&colonnes);     
      
      printf("Donner les valeurs: ");
-     matrice *B=creer_matrice("B",lignes,colonnes,NON_SYMETRIQUE);
+     matrice *B=creer_matrice("B",lignes,colonnes,NON_SYMETRIQUE, INVERSIBLE, POSITIVE);
      valeurs=recupererNValeurs(lignes*colonnes);
      remplir_matrice(*B, valeurs);
      afficher_matrice(*B);
@@ -57,7 +57,7 @@ int main()
      
      printf("Donner les valeurs du triangle inf: ");
      
-     matrice *A=creer_matrice("A",lignes,colonnes,SYMETRIQUE);
+     matrice *A=creer_matrice("A",lignes,colonnes, SYMETRIQUE, INVERSIBLE, POSITIVE);
      TYPE_ELEMENTS_MATRICE* valeurs=recupererNValeurs(lignes*(lignes+1)/2);
      remplir_matrice(*A, valeurs);
      afficher_matrice(*A);
@@ -69,7 +69,7 @@ int main()
      scanf("%d",&colonnes);     
      
      printf("Donner les valeurs du triangle inf: ");
-     matrice *B=creer_matrice("B",lignes,colonnes,SYMETRIQUE);
+     matrice *B=creer_matrice("B",lignes,colonnes, SYMETRIQUE, INVERSIBLE, POSITIVE);
      valeurs=recupererNValeurs(lignes*(lignes+1)/2);
      remplir_matrice(*B, valeurs);
      afficher_matrice(*B);
@@ -87,7 +87,7 @@ int main()
      
      
      /* Programme test Cholesky */
-     
+     /*
      int lignes, colonnes;
 
      
@@ -98,7 +98,7 @@ int main()
      
      printf("Donner les valeurs: ");
      
-     matrice *A=creer_matrice("A",lignes,colonnes,SYMETRIQUE);
+     matrice *A=creer_matrice("A",lignes,colonnes, SYMETRIQUE, INVERSIBLE, POSITIVE);
      TYPE_ELEMENTS_MATRICE* valeurs=recupererNValeurs(lignes*(lignes+1)/2);
      remplir_matrice(*A, valeurs);
      afficher_matrice(*A);
@@ -118,10 +118,53 @@ int main()
           detruire_matrice(BT);
           detruire_matrice(P);
      }
+     
+
+               
+     detruire_matrice(A);
+     */
+     
+     
+     
+     
+     
+     
+     
+     /* Programme test LU */
+     
+     int lignes, colonnes;
+
+     
+     printf("Nombre de lignes: ");
+     scanf("%d",&lignes);
+     printf("Nombre de colonnes: ");
+     scanf("%d",&colonnes);     
+     
+     printf("Donner les valeurs: ");
+     
+     matrice *A=creer_matrice("A",lignes,colonnes,NON_SYMETRIQUE, INVERSIBLE, POSITIVE);
+     TYPE_ELEMENTS_MATRICE* valeurs=recupererNValeurs(lignes*colonnes);
+     remplir_matrice(*A, valeurs);
+     afficher_matrice(*A);
+     
+     matrice *A_L, *A_U;
+     if(decompositionLU(A,&A_L,&A_U)==0) printf("La matrice que vous essayez de decomposer est symetrique ou pas definie positive.\n");
+          
+     else
+     {
+          afficher_matrice(*A_L);
+          afficher_matrice(*A_U);
+          
+          matrice *P=produitMatriciel(A_L,A_U);
+          afficher_matrice(*P);
+          detruire_matrice(A_L);
+          detruire_matrice(A_U);
+          detruire_matrice(P);
+     }
+     
                
      detruire_matrice(A);
 
-     
      
      
 }
