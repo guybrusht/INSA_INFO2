@@ -12,8 +12,8 @@ else
 endif
 
 
-all: head.h main.o func.o 
-	$(CC) main.o func.o libmat.a -lm
+all: head.h main.o func.o calcul.o
+	$(CC) main.o func.o calcul.o libmat.a -lm
 	
 clean:
 	rm -rf *.o
@@ -26,5 +26,8 @@ main.o: head.h main.c
 func.o: head.h func.c 
 	$(CC) $(CFLAGS) func.c
 
+calcul.o: head.h calcul.c 
+	$(CC) $(CFLAGS) calcul.c
+
 libmat.a: 
-	ar -a libmat.a func.o
+	ar -a libmat.a func.o calcul.o
