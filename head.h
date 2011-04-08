@@ -59,6 +59,8 @@ void remplir_matrice_symetrique(matrice, TYPE_ELEMENTS_MATRICE*);
 matrice* transposerMatrice(matrice* matriceA);
 
 /* Fonctions de calcul */
+TYPE_ELEMENTS_MATRICE determinantMatrice(matrice* matriceA);
+TYPE_ELEMENTS_MATRICE determinant(TYPE_ELEMENTS_MATRICE**, int); //3e niveau
 matrice* produitMatriciel(matrice*, matrice*);
 void calculProduit(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int, int, int);  // 3e niveau
 void calculProduitSym(TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, TYPE_ELEMENTS_MATRICE**, int, int, int);  // 3e niveau

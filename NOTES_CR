@@ -33,7 +33,7 @@ exemple de commande pour tester bug:
 
 
 
-valgrind m'a permis de resoudre un beau plantage:
+valgrind (http://valgrind.org/) m'a permis de resoudre un beau plantage:
 et un oubli de liberation
 
 [guybrusht@ArchLaptop ProjetINFO]$ ./a.out

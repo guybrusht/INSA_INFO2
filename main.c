@@ -264,10 +264,15 @@ int main()
      remplir_matrice(*A, valeurs);
      free(valeurs);
      afficher_matrice(*A);
+     if(determinantMatrice(A)==0)
+     {
+          A->inversible=NON_INVERSIBLE;
+          printf(" *   /!\\ ATTENTION: LA MATRICE N'EST PAS INVERSIBLE, VOUS ALLEZ DROIT DANS LE MUR!!\n");
+     }
      
      
      /* Remplissage et affichage de B */
-     printf("\n *   Donner les valeurs pour le vecteur B: \n");     
+     printf(" *   Donner les valeurs pour le vecteur B: \n");     
      matrice *B=creer_matrice("B",n,1,NON_SYMETRIQUE, INVERSIBLE, NON_POSITIVE);
      valeurs=recupererNValeurs(n*1);
      remplir_matrice(*B, valeurs);
@@ -277,20 +282,22 @@ int main()
      
      /* Resolution du systeme */
      matrice *X;
-     solve(A,B,&X);
+     if(solve(A,B,&X)==1)
+     {
+          /* Produit y=Ax */
+          printf("\n\n\n\n\n *   Passage a la phase de verification.\n");
+          printf(" *   Calcul du produit y=Ax");
+          matrice *P=produitMatriciel(A,X);
+          afficher_matrice(*P);
+          
+          /* Liberation des allocations */          
+          detruire_matrice(P);
+          detruire_matrice(X);
+     }
+     
 
-     
-     /* Produit y=Ax */
-     printf("\n\n\n\n\n *   Passage a la phase de verification.\n");
-     printf(" *   Calcul du produit y=Ax");
-     matrice *P=produitMatriciel(A,X);
-     afficher_matrice(*P);
-     
-     
      /* Liberation des allocations */
      detruire_matrice(B);
-     detruire_matrice(P);
-     detruire_matrice(X);
      detruire_matrice(A);
 
 }

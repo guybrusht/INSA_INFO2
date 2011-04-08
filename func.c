@@ -474,9 +474,13 @@ int solve(matrice *matriceA, matrice *matriceB, matrice **matriceX)
      {
           matrice *A_L, *A_U;
           if(decompositionLU(matriceA,&A_L,&A_U)==0)
+          {
                #ifdef DBG
-               printf("La matrice que vous essayez de decomposer est symetrique ou pas definie positive.\n");
+               printf("ECHEC: La matrice que vous essayez de decomposer est symetrique ou pas definie positive.\n");
                #endif
+               return 0;
+          }
+          
           else
           {
                printf("La decomposition LU donne la matrice L suivante:");
@@ -484,9 +488,13 @@ int solve(matrice *matriceA, matrice *matriceB, matrice **matriceX)
 
                matrice *Y=resolutionGauss(A_L, matriceB);
                if(Y==NULL)
+               {
                     #ifdef DBG
-                    printf("La matrice que vous essayez de decomposer est symetrique ou pas definie positive.\n");
+                    printf("ECHEC: La matrice que vous essayez de decomposer est symetrique ou pas definie positive.\n");
                     #endif
+                    return 0;
+               }
+               
                else
                {
                     printf("La resolution par Gauss donne la matrice Y suivante:");
@@ -494,9 +502,13 @@ int solve(matrice *matriceA, matrice *matriceB, matrice **matriceX)
                     
                     matrice *X=resolutionGauss(A_U, Y);
                     if(X==NULL)
+                    {
                          #ifdef DBG     
-                         printf("La matrice que vous essayez de decomposer est symetrique ou pas definie positive.\n");
+                         printf("ECHEC: La matrice que vous essayez de decomposer est symetrique ou pas definie positive.\n");
                          #endif
+                         return 0;
+                    }
+                    
                     else
                     {
                          printf("\n\n\n\n\n");       
@@ -511,6 +523,8 @@ int solve(matrice *matriceA, matrice *matriceB, matrice **matriceX)
                } 
                detruire_matrice(A_L);
                detruire_matrice(A_U);
+               
+               return 1;
 
           }
           
@@ -520,9 +534,13 @@ int solve(matrice *matriceA, matrice *matriceB, matrice **matriceX)
      {
           matrice *C=decompositionCholesky(matriceA);
           if(C==NULL)
+          {
                #ifdef DBG
-               printf("La matrice que vous essayez de decomposer n'est pas symetrique ou pas definie positive.\n");
+               printf("ECHEC: La matrice que vous essayez de decomposer n'est pas symetrique ou pas definie positive.\n");
                #endif
+               return 0;
+          }
+          
           else
           {
 
@@ -530,9 +548,13 @@ int solve(matrice *matriceA, matrice *matriceB, matrice **matriceX)
                afficher_matrice(*C);
                matrice *Y=resolutionGauss(C, matriceB);
                if(Y==NULL)
+               {
                     #ifdef DBG     
-                    printf("La matrice que vous essayez de decomposer est symetrique ou pas definie positive.\n");
+                    printf("ECHEC: La matrice que vous essayez de decomposer est symetrique ou pas definie positive.\n");
                     #endif
+                    return 0;
+               }
+               
                else
                {
 
@@ -543,12 +565,19 @@ int solve(matrice *matriceA, matrice *matriceB, matrice **matriceX)
                     
                     matrice *X=resolutionGauss(CT, Y);
                     if(X==NULL)
+                    {
                          #ifdef DBG     
-                         printf("La matrice que vous essayez de decomposer est symetrique ou pas definie positive.\n");
+                         printf("ECHEC: La matrice que vous essayez de decomposer est symetrique ou pas definie positive.\n");
                          #endif
+                         return 0;
+                    }
+                    
                     else
                     {
-                         printf("La resolution par Gauss donne la matrice X suivante:");                     
+                         printf("\n\n\n\n\n");       
+                         printf("****************************************************\n");       
+                         printf("La resolution par Gauss donne la matrice X suivante:\n");
+                         printf("****************************************************");                        
                          strcpy(X->nom,"SOLUTION FINALE");
                          afficher_matrice(*X);
                          *matriceX=X;
@@ -557,8 +586,76 @@ int solve(matrice *matriceA, matrice *matriceB, matrice **matriceX)
                     detruire_matrice(Y);
                }         
                detruire_matrice(C);
+               return 1;
           }
           
      }
           
 }
+
+
+TYPE_ELEMENTS_MATRICE determinantMatrice(matrice* matriceA)
+{
+     if(matriceA->symetrique==NON_SYMETRIQUE) return determinant(matriceA->tableau_2d,matriceA->nb_lignes);
+     else
+     {
+          TYPE_ELEMENTS_MATRICE **pleine = malloc((matriceA->nb_lignes)*sizeof(TYPE_ELEMENTS_MATRICE *));
+          int i,j;
+          for (i=0;i<matriceA->nb_lignes;i++)
+               pleine[i] = malloc((matriceA->nb_lignes)*sizeof(TYPE_ELEMENTS_MATRICE));
+          
+          for (i=0;i<matriceA->nb_lignes;i++)
+          {
+               for (j=0;j<=i;j++)
+                    pleine[i][j]=matriceA->tableau_2d[i][j];
+               for (j=i+1;j<matriceA->nb_lignes;j++)
+                    pleine[i][j]=matriceA->tableau_2d[j][i];
+          }
+          
+          
+          TYPE_ELEMENTS_MATRICE det=determinant(pleine,matriceA->nb_lignes);
+          for (i=0;i<matriceA->nb_lignes;i++)
+               free(pleine[i]);
+          free(pleine);
+          return det;
+     }
+          
+}
+
+
+TYPE_ELEMENTS_MATRICE determinant(TYPE_ELEMENTS_MATRICE **tableauA, int n) // n doit etre > 1
+{
+     int i,j,j1,j2;
+     TYPE_ELEMENTS_MATRICE det = 0;
+     TYPE_ELEMENTS_MATRICE **m = NULL;
+
+     if (n==2)
+          det = tableauA[0][0] * tableauA[1][1] - tableauA[1][0] * tableauA[0][1];
+     else if (n>2)
+     {
+          det = 0;
+          for (j1=0;j1<n;j1++)
+          {
+               m = malloc((n-1)*sizeof(TYPE_ELEMENTS_MATRICE *));
+               for (i=0;i<n-1;i++)
+                    m[i] = malloc((n-1)*sizeof(TYPE_ELEMENTS_MATRICE));
+               for (i=1;i<n;i++)
+               {
+                    j2 = 0;
+                    for (j=0;j<n;j++) 
+                    {
+                         if (j == j1) continue;
+                    m[i-1][j2] = tableauA[i][j];
+                    j2++;
+                    }
+               }
+               det += pow(-1.0,1.0+j1+1.0) * tableauA[0][j1] * determinant(m,n-1);
+               for (i=0;i<n-1;i++)
+                    free(m[i]);
+               free(m);
+          }
+     }
+     return(det);
+}
+
+
