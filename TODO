@@ -1,15 +1,5 @@
 TODO
 
-PIVOT DE GAUSS
-
-
-
-• déterminer x solution de Ax = b par appel à une fonction solve(A, b, x)
-• afficher le résultat
-• vérifier le résultat par appel à une fonction qui calcule
-• afficher le résultat
-• libérer l'espace mémoire alloué dynamiquement au cours du programme.
-
 
 Fonctions de conversion de matrice symetrique vers non symettrique et vice versa
 

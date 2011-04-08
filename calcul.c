@@ -15,7 +15,7 @@ matrice* produitMatriciel(matrice *matriceA, matrice *matriceB)
           strcat(nouveauNom,matriceB->nom);
           
           /* Creation matrice bonnes dimensions */
-          matrice *produit=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceB->nb_colonnes,NON_SYMETRIQUE, INVERSIBLE, POSITIVE);
+          matrice *produit=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceB->nb_colonnes,NON_SYMETRIQUE, NON_INVERSIBLE, NON_POSITIVE);
           
           
           /* Calcul du produit */
@@ -33,7 +33,8 @@ matrice* produitMatriciel(matrice *matriceA, matrice *matriceB)
 
 void calculProduit(TYPE_ELEMENTS_MATRICE **tableauA, TYPE_ELEMENTS_MATRICE **tableauB, TYPE_ELEMENTS_MATRICE **tableauResultat, int nbLignesA, int nbColonnesA, int nbColonnesB)
 {
-     int i,j,k,tmp;
+     int i,j,k;
+     TYPE_ELEMENTS_MATRICE tmp;
      
      for(i=0;i<nbLignesA;i++)  // ligne de calcul de la premiere matrice
      {
@@ -51,7 +52,8 @@ void calculProduit(TYPE_ELEMENTS_MATRICE **tableauA, TYPE_ELEMENTS_MATRICE **tab
 
 void calculProduitSym(TYPE_ELEMENTS_MATRICE **tableauA, TYPE_ELEMENTS_MATRICE **tableauB, TYPE_ELEMENTS_MATRICE **tableauResultat, int nbLignesA, int nbColonnesA, int nbColonnesB)
 {
-     int i,j,k,tmp;
+     int i,j,k;
+     TYPE_ELEMENTS_MATRICE tmp;
      
      for(i=0;i<nbLignesA;i++)  // ligne de calcul de la premiere matrice
      {
@@ -195,7 +197,7 @@ int decompLU(TYPE_ELEMENTS_MATRICE **tableauADecomposer, TYPE_ELEMENTS_MATRICE *
 
 matrice* resolutionGauss(matrice *matriceA, matrice *matriceB)      // retourne pointeur vers X si succes ou NULL si une erreur s'est produite
 {
-     if(matriceA->symetrique==SYMETRIQUE || matriceA->inversible!=INVERSIBLE || matriceA->positive!=POSITIVE || matriceA->nb_lignes!=matriceB->nb_lignes || matriceB->nb_colonnes!=1)
+     if(matriceA->symetrique==SYMETRIQUE || matriceA->inversible!=INVERSIBLE || matriceA->positive!=POSITIVE || matriceA->nb_lignes!=matriceB->nb_lignes)
           return NULL;
      
      else
@@ -207,9 +209,9 @@ matrice* resolutionGauss(matrice *matriceA, matrice *matriceB)      // retourne 
           strcat(nouveauNom,"*(?)=");
           strcat(nouveauNom,matriceB->nom);
           strcat(nouveauNom,"]");
-          matrice *solAXB=creer_matrice(nouveauNom, matriceA->nb_lignes, 1,NON_SYMETRIQUE, INVERSIBLE, NON_POSITIVE);
+          matrice *solAXB=creer_matrice(nouveauNom, matriceA->nb_lignes, matriceB->nb_colonnes,NON_SYMETRIQUE, INVERSIBLE, NON_POSITIVE);
           
-          if(pivotDeGauss(matriceA->tableau_2d, matriceB->tableau_2d, matriceA->nb_lignes, solAXB->tableau_2d)==0) return NULL;
+          if(pivotDeGauss(matriceA->tableau_2d, matriceB->tableau_2d, matriceA->nb_lignes, matriceB->nb_colonnes, solAXB->tableau_2d)==0) return NULL;
           else
           {
                return solAXB;
@@ -219,7 +221,7 @@ matrice* resolutionGauss(matrice *matriceA, matrice *matriceB)      // retourne 
 }
 
 
-int pivotDeGauss(TYPE_ELEMENTS_MATRICE **tableauA, TYPE_ELEMENTS_MATRICE **tableauB, int n, TYPE_ELEMENTS_MATRICE **tableauX) // vaut 0 si pivot nul et resolution impossible ou 1 si succes
+int pivotDeGauss(TYPE_ELEMENTS_MATRICE **tableauA, TYPE_ELEMENTS_MATRICE **tableauB, int n, int m, TYPE_ELEMENTS_MATRICE **tableauX) // vaut 0 si pivot nul et resolution impossible ou 1 si succes
 {
 
      int i,j,k;
@@ -252,20 +254,26 @@ int pivotDeGauss(TYPE_ELEMENTS_MATRICE **tableauA, TYPE_ELEMENTS_MATRICE **table
           for(i=k+1;i<n;i++)
           {
                pivot=TAB[i][k]/TAB[k][k];
-               for (j=k;j<n;j++) TAB[i][j]=TAB[i][j]-pivot*TAB[k][j];
-               tableauB[0][i]=tableauB[0][i]-pivot*tableauB[0][k];
+               for(j=k;j<n;j++) TAB[i][j]=TAB[i][j]-pivot*TAB[k][j];
+               for(j=0;j<m;j++) tableauB[i][j]=tableauB[i][j]-pivot*tableauB[k][j];//
           }
      }
      
      /*  resolution par pivot de Gauss */
      
-     for(i=n-1;i>=0;i--)
+     for(k=0;k<m;k++)//
      {
-          tmp=tableauB[0][i];   
-          for(j=i+1;j<n;j++)
-               tmp-=TAB[i][j]*tableauX[0][j];                    
-          tableauX[0][i]=tmp/TAB[i][i];
-     }     
+          
+          for(i=n-1;i>=0;i--)
+          {
+
+               tmp=tableauB[i][k];   
+               for(j=i+1;j<n;j++)
+                    tmp-=TAB[i][j]*tableauX[j][k];                    
+               tableauX[i][k]=tmp/TAB[i][i];
+
+          }     
+     }
  
      free(TAB[0]);
      free(TAB);

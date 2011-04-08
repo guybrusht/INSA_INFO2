@@ -216,7 +216,7 @@ int main()
      /* Programme principal */
      
      
-     int is_A_symetrique, n;
+     int is_A_symetrique, n, m;
 
      /* Choix de la methode et parametrage du systeme */
      printf("\n *******************************************************\n");    
@@ -271,10 +271,13 @@ int main()
      }
      
      
+     printf(" *   Nombre de colonnes de B :\n *   M = ");
+     scanf("%d",&m); 
      /* Remplissage et affichage de B */
-     printf(" *   Donner les valeurs pour le vecteur B: \n");     
-     matrice *B=creer_matrice("B",n,1,NON_SYMETRIQUE, INVERSIBLE, NON_POSITIVE);
-     valeurs=recupererNValeurs(n*1);
+     printf(" *   Donner les valeurs pour le vecteur B: \n");
+     printf(" *   /!\\ Attention: il faut rentrer les valeurs ligne par ligne, donc toute la premiere puis toute la 2e, etc\n");
+     matrice *B=creer_matrice("B",n,m,NON_SYMETRIQUE, NON_INVERSIBLE, NON_POSITIVE);
+     valeurs=recupererNValeurs(n*m);
      remplir_matrice(*B, valeurs);
      free(valeurs);
      afficher_matrice(*B);
